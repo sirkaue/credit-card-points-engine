@@ -1,5 +1,6 @@
 package com.sirkaue.creditcardpointsengine.domain;
 
+import com.sirkaue.creditcardpointsengine.domain.exception.InvalidTransactionException;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -56,7 +57,7 @@ class TransactionTest {
         Instant date = Instant.now();
         Card card = new Card("1234", CardType.GOLD, "John Doe");
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        NullPointerException exception = assertThrows(NullPointerException.class,
                 () -> new Transaction(null, currency, date, card));
         assertEquals("Transaction amount is required.", exception.getMessage());
     }
@@ -67,7 +68,7 @@ class TransactionTest {
         Instant date = Instant.now();
         Card card = new Card("1234", CardType.GOLD, "John Doe");
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        InvalidTransactionException exception = assertThrows(InvalidTransactionException.class,
                 () -> new Transaction(BigDecimal.valueOf(-1), currency, date, card));
         assertEquals("Transaction amount cannot be negative.", exception.getMessage());
     }
@@ -78,7 +79,7 @@ class TransactionTest {
         Instant date = Instant.now();
         Card card = new Card("1234", CardType.GOLD, "John Doe");
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        NullPointerException exception = assertThrows(NullPointerException.class,
                 () -> new Transaction(amount, null, date, card));
         assertEquals("Currency is required.", exception.getMessage());
     }
@@ -89,7 +90,7 @@ class TransactionTest {
         Currency currency = Currency.USD;
         Card card = new Card("1234", CardType.GOLD, "John Doe");
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        NullPointerException exception = assertThrows(NullPointerException.class,
                 () -> new Transaction(amount, currency, null, card));
         assertEquals("Transaction timestamp is required.", exception.getMessage());
     }
@@ -100,7 +101,7 @@ class TransactionTest {
         Currency currency = Currency.USD;
         Instant date = Instant.now();
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        NullPointerException exception = assertThrows(NullPointerException.class,
                 () -> new Transaction(amount, currency, date, null));
         assertEquals("Card is required for a transaction.", exception.getMessage());
     }
