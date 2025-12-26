@@ -1,5 +1,6 @@
 package com.sirkaue.creditcardpointsengine.domain;
 
+import com.sirkaue.creditcardpointsengine.domain.exception.InvalidCardException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,33 +18,33 @@ class CardTest {
         Card card = new Card(id, type, owner);
 
         // assert
-        assertEquals(id, card.getId());
-        assertEquals(type, card.getType());
-        assertEquals(owner, card.getOwner());
+        assertEquals(id, card.id());
+        assertEquals(type, card.type());
+        assertEquals(owner, card.owner());
     }
 
     @Test
     void shouldThrowExceptionWhenIdIsNull() {
-        IllegalArgumentException exception =
-                assertThrows(IllegalArgumentException.class,
+        NullPointerException exception =
+                assertThrows(NullPointerException.class,
                         () -> new Card(null, CardType.GOLD, "Kauê"));
 
-        assertEquals("Card id cannot be null or blank", exception.getMessage());
+        assertEquals("Card id cannot be null", exception.getMessage());
     }
 
     @Test
     void shouldThrowExceptionWhenIdIsBlank() {
-        IllegalArgumentException exception =
-                assertThrows(IllegalArgumentException.class,
+        InvalidCardException exception =
+                assertThrows(InvalidCardException.class,
                         () -> new Card("   ", CardType.GOLD, "Kauê"));
 
-        assertEquals("Card id cannot be null or blank", exception.getMessage());
+        assertEquals("Card id cannot be blank", exception.getMessage());
     }
 
     @Test
     void shouldThrowExceptionWhenTypeIsNull() {
-        IllegalArgumentException exception =
-                assertThrows(IllegalArgumentException.class,
+        NullPointerException exception =
+                assertThrows(NullPointerException.class,
                         () -> new Card("card-123", null, "Kauê"));
 
         assertEquals("Card type cannot be null", exception.getMessage());
@@ -51,19 +52,19 @@ class CardTest {
 
     @Test
     void shouldThrowExceptionWhenOwnerIsNull() {
-        IllegalArgumentException exception =
-                assertThrows(IllegalArgumentException.class,
+        NullPointerException exception =
+                assertThrows(NullPointerException.class,
                         () -> new Card("card-123", CardType.GOLD, null));
 
-        assertEquals("Card owner cannot be null or blank", exception.getMessage());
+        assertEquals("Card owner cannot be null", exception.getMessage());
     }
 
     @Test
     void shouldThrowExceptionWhenOwnerIsBlank() {
-        IllegalArgumentException exception =
-                assertThrows(IllegalArgumentException.class,
+        InvalidCardException exception =
+                assertThrows(InvalidCardException.class,
                         () -> new Card("card-123", CardType.GOLD, "  "));
 
-        assertEquals("Card owner cannot be null or blank", exception.getMessage());
+        assertEquals("Card owner cannot be blank", exception.getMessage());
     }
 }
