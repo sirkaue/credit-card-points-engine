@@ -1,7 +1,10 @@
 package com.sirkaue.creditcardpointsengine.domain;
 
+import com.sirkaue.creditcardpointsengine.domain.exception.InvalidTransactionException;
+
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 
 public final class Transaction {
@@ -18,42 +21,21 @@ public final class Transaction {
     }
 
     public Transaction(BigDecimal amount, Currency currency, Instant date, Card card, StrategyType strategyType) {
-        this.amount = validateValue(amount);
-        this.currency = validateCurrency(currency);
-        this.date = validateDate(date);
-        this.card = validateCard(card);
-        this.strategyType = strategyType != null ? strategyType : StrategyType.DEFAULT;
+        this.amount = validateAmount(amount);
+        this.currency = Objects.requireNonNull(currency, "Currency is required.");
+        this.date = Objects.requireNonNull(date, "Transaction timestamp is required.");
+        this.card = Objects.requireNonNull(card, "Card is required for a transaction.");
+        this.strategyType = Objects.requireNonNullElse(strategyType, StrategyType.DEFAULT);
     }
 
-    private BigDecimal validateValue(BigDecimal amount) {
-        if (amount == null) {
-            throw new IllegalArgumentException("Transaction amount is required.");
-        }
+    private BigDecimal validateAmount(BigDecimal amount) {
+        Objects.requireNonNull(amount, "Transaction amount is required.");
+
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Transaction amount cannot be negative.");
+            throw new InvalidTransactionException("Transaction amount cannot be negative.");
         }
+
         return amount;
-    }
-
-    private Currency validateCurrency(Currency currency) {
-        if (currency == null) {
-            throw new IllegalArgumentException("Currency is required.");
-        }
-        return currency;
-    }
-
-    private Instant validateDate(Instant date) {
-        if (date == null) {
-            throw new IllegalArgumentException("Transaction timestamp is required.");
-        }
-        return date;
-    }
-
-    private Card validateCard(Card card) {
-        if (card == null) {
-            throw new IllegalArgumentException("Card is required for a transaction.");
-        }
-        return card;
     }
 
     public String getId() {
