@@ -1,29 +1,34 @@
 package com.sirkaue.creditcardpointsengine.domain;
 
-public final class Card {
+import com.sirkaue.creditcardpointsengine.domain.exception.InvalidCardException;
 
-    private final String id;
-    private final CardType type;
-    private final String owner;
+import java.util.Objects;
+
+public record Card(String id, CardType type, String owner) {
 
     public Card(String id, CardType type, String owner) {
-        if (id == null || id.isBlank()) throw new IllegalArgumentException("Card id cannot be null or blank");
-        if (type == null) throw new IllegalArgumentException("Card type cannot be null");
-        if (owner == null || owner.isBlank()) throw new IllegalArgumentException("Card owner cannot be null or blank");
-        this.id = id;
-        this.type = type;
-        this.owner = owner;
+        this.id = validateId(id);
+        this.type = Objects.requireNonNull(type, "Card type cannot be null");
+        this.owner = validateOwner(owner);
     }
 
-    public String getId() {
+    private String validateId(String id) {
+        Objects.requireNonNull(id, "Card id cannot be null");
+
+        if (id.isBlank()) {
+            throw new InvalidCardException("Card id cannot be blank");
+        }
+
         return id;
     }
 
-    public CardType getType() {
-        return type;
-    }
+    private String validateOwner(String owner) {
+        Objects.requireNonNull(owner, "Card owner cannot be null");
 
-    public String getOwner() {
+        if (owner.isBlank()) {
+            throw new InvalidCardException("Card owner cannot be blank");
+        }
+
         return owner;
     }
 }
