@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 
 public final class CalculatePointsInteractor implements CalculatePointsUseCase {
 
@@ -23,9 +24,9 @@ public final class CalculatePointsInteractor implements CalculatePointsUseCase {
 
     public CalculatePointsInteractor(ExchangeRatePort exchangeRatePort, CardTypeStrategyPort cardTypeStrategyPort,
                                      PointsStrategyPort pointsStrategyPort) {
-        this.exchangeRatePort = exchangeRatePort;
-        this.cardTypeStrategyPort = cardTypeStrategyPort;
-        this.pointsStrategyPort = pointsStrategyPort;
+        this.exchangeRatePort = Objects.requireNonNull(exchangeRatePort);
+        this.cardTypeStrategyPort = Objects.requireNonNull(cardTypeStrategyPort);
+        this.pointsStrategyPort = Objects.requireNonNull(pointsStrategyPort);
     }
 
     @Override
@@ -37,7 +38,7 @@ public final class CalculatePointsInteractor implements CalculatePointsUseCase {
         PointsStrategy pointsStrategy = pointsStrategyPort.getStrategy(txInUsd.getStrategyType());
         BigDecimal basePoints = pointsStrategy.calculatePoints(txInUsd);
 
-        CardTypeStrategy cardStrategy = cardTypeStrategyPort.getStrategy(txInUsd.getCard().getType());
+        CardTypeStrategy cardStrategy = cardTypeStrategyPort.getStrategy(txInUsd.getCard().type());
         BigDecimal finalPoints = cardStrategy.applyMultiplier(basePoints);
 
         log.info("Transaction {} calculated: base={}, final={}", tx.getId(), basePoints, finalPoints);
