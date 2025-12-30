@@ -1,7 +1,6 @@
 package com.sirkaue.creditcardpointsengine.application.usecase;
 
 import com.sirkaue.creditcardpointsengine.application.gateways.CardTypeStrategyPort;
-import com.sirkaue.creditcardpointsengine.application.gateways.ExchangeRatePort;
 import com.sirkaue.creditcardpointsengine.application.gateways.PointsStrategyPort;
 import com.sirkaue.creditcardpointsengine.domain.Currency;
 import com.sirkaue.creditcardpointsengine.domain.Transaction;
@@ -12,21 +11,18 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Objects;
 
 public final class CalculatePointsInteractor implements CalculatePointsUseCase {
 
     private static final Logger log = LoggerFactory.getLogger(CalculatePointsInteractor.class);
+    private static final BigDecimal BRL_TO_USD_RATE = new BigDecimal("5.25");
 
-    private final ExchangeRatePort exchangeRatePort;
     private final CardTypeStrategyPort cardTypeStrategyPort;
     private final PointsStrategyPort pointsStrategyPort;
 
-    public CalculatePointsInteractor(ExchangeRatePort exchangeRatePort, CardTypeStrategyPort cardTypeStrategyPort,
-                                     PointsStrategyPort pointsStrategyPort) {
-        this.exchangeRatePort = Objects.requireNonNull(exchangeRatePort);
-        this.cardTypeStrategyPort = Objects.requireNonNull(cardTypeStrategyPort);
-        this.pointsStrategyPort = Objects.requireNonNull(pointsStrategyPort);
+    public CalculatePointsInteractor(CardTypeStrategyPort cardTypeStrategyPort, PointsStrategyPort pointsStrategyPort) {
+        this.cardTypeStrategyPort = cardTypeStrategyPort;
+        this.pointsStrategyPort = pointsStrategyPort;
     }
 
     @Override
@@ -51,8 +47,7 @@ public final class CalculatePointsInteractor implements CalculatePointsUseCase {
             return tx;
         }
 
-        BigDecimal rate = exchangeRatePort.getBrlPerUsdRate(tx.getDate());
-        BigDecimal usd = tx.getAmount().divide(rate, 8, RoundingMode.HALF_UP);
+        BigDecimal usd = tx.getAmount().divide(BRL_TO_USD_RATE, 8, RoundingMode.HALF_UP);
 
         return new Transaction(
                 usd,
