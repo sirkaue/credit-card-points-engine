@@ -1,7 +1,6 @@
 package com.sirkaue.creditcardpointsengine.application.usecase;
 
 import com.sirkaue.creditcardpointsengine.application.gateways.CardTypeStrategyPort;
-import com.sirkaue.creditcardpointsengine.application.gateways.ExchangeRatePort;
 import com.sirkaue.creditcardpointsengine.application.gateways.PointsStrategyPort;
 import com.sirkaue.creditcardpointsengine.domain.Card;
 import com.sirkaue.creditcardpointsengine.domain.CardType;
@@ -25,9 +24,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CalculatePointsInteractorTest {
-
-    @Mock
-    ExchangeRatePort exchangeRatePort;
 
     @Mock
     CardTypeStrategyPort cardTypeStrategyPort;
@@ -68,21 +64,19 @@ class CalculatePointsInteractorTest {
         verify(pointsStrategy).calculatePoints(tx);
         verify(cardTypeStrategyPort).getStrategy(CardType.PLATINUM);
         verify(cardStrategy).applyMultiplier(new BigDecimal("50"));
-        verifyNoMoreInteractions(pointsStrategyPort, pointsStrategy, cardTypeStrategyPort, cardStrategy, exchangeRatePort);
+        verifyNoMoreInteractions(pointsStrategyPort, pointsStrategy, cardTypeStrategyPort, cardStrategy);
     }
 
     @Test
     void shouldConvertBrlToUsdAndCalculatePoints() {
         // Arrange
         Transaction tx = new Transaction(
-                new BigDecimal("500"),
+                new BigDecimal("525"),  // 525 BRL / 5.25 = 100 USD
                 Currency.BRL,
                 Instant.now(),
                 new Card("card-002", CardType.GOLD, "Bob"),
                 StrategyType.TRAVEL
         );
-
-        when(exchangeRatePort.getBrlPerUsdRate(tx.getDate())).thenReturn(new BigDecimal("5"));
 
         PointsStrategy pointsStrategy = mock(PointsStrategy.class);
         when(pointsStrategyPort.getStrategy(StrategyType.TRAVEL)).thenReturn(pointsStrategy);
@@ -96,8 +90,7 @@ class CalculatePointsInteractorTest {
         PointsCalculationResult result = interactor.execute(tx);
 
         // Assert
-        assertTrue(result.amountInUsd().compareTo(new BigDecimal("100")) == 0);
+        assertEquals(0, result.amountInUsd().compareTo(new BigDecimal("100")));
         assertEquals(new BigDecimal("30"), result.points());
-        verify(exchangeRatePort).getBrlPerUsdRate(tx.getDate());
     }
 }
