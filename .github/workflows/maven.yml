@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 21
-          distribution: 'zulu' # Alternative distribution options are available.
+          distribution: 'temurin' # Alternative distribution options are available.
 
       - name: Cache SonarQube packages
         uses: actions/cache@v4
@@ -48,7 +48,8 @@ jobs:
           mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
           -Dsonar.projectKey=sirkaue_credit-card-points-engine \
           -Dsonar.organization=sirkaue \
-          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.coverage.exclusions="**/infrastructure/**"
 
       - name: Docker Build Check
         run: docker build -t credit-card-points-engine:check .
